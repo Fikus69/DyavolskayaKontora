@@ -1,0 +1,6 @@
+@DyavolskayaKontora_HostAddress = http://localhost:5091
+
+GET {{DyavolskayaKontora_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
