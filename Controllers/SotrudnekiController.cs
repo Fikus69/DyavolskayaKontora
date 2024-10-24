@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using DyavolskayaKontora.Model;
 using DyavolskayaKontora.DB;
+using Microsoft.EntityFrameworkCore;
 
 namespace DyavolskayaKontora.Controllers
 {
@@ -9,31 +10,40 @@ namespace DyavolskayaKontora.Controllers
     [ApiController]
     public class SotrudnekiController : ControllerBase
     {
-        private readonly DB.DB dB;
+        private readonly DB.DB db;
 
         public SotrudnekiController(DB.DB db)
         { 
-            this.dB = db;
+            this.db = db;
         }
 
-        [HttpPost("НоваяКровь")]
-        public async void AddSotrudnek(Devil sotrudnek)
+
+        [HttpPost("PoluchitBloods")]
+        public async Task<List<Devil>> GetSotrudneki()
         {
-            dB.Sotrudneki.Add(sotrudnek); 
-            await dB.SaveChangesAsync();
+            List<Devil> devils = new List<Devil>();
+            devils = db.Devils.Include(s => s.Racks).ToList();
+            return devils;
         }
 
-        [HttpPost("ЧотаИзменилось")]
-        public async void UpdateSotrudnek(Devil sotrudnek)
+        [HttpPost("NewBlood")]
+        public async Task AddSotrudnek(Devil sotrudnek)
         {
-            dB.Sotrudneki.Update(sotrudnek);
-            await dB.SaveChangesAsync();
+            db.Devils.Add(sotrudnek); 
+            await db.SaveChangesAsync();
         }
 
-        [HttpPost("БольшеНеНашаКровь")]
+        [HttpPost("Cho-taIzmenilos")]
+        public async Task UpdateSotrudnek(Devil sotrudnek)
+        {
+            db.Devils.Update(sotrudnek);
+            await db.SaveChangesAsync();
+        }
+
+        [HttpPost("BolsheNeNashaBlood")]
         public async Task<IActionResult> EraseSotrudnek(int devilId, string name, int date) 
         {
-            var sotrednek = await dB.Sotrudneki.FindAsync(devilId, name, date);
+            var sotrednek = await db.Devils.FindAsync(devilId, name, date);
             if (sotrednek == null)
             {
                 return NotFound("Дьявольская жопа не найдена");
@@ -42,10 +52,10 @@ namespace DyavolskayaKontora.Controllers
             {
                 Id = devilId, Title = name, Year = date
             };
-           dB.Disposals.Add(dispose);
-            dB.Sotrudneki.Remove(sotrednek);
+            db.Disposals.Add(dispose);
+            db.Devils.Remove(sotrednek);
 
-            await dB.SaveChangesAsync();
+            await db.SaveChangesAsync();
 
             return Ok("Чорт найден и устранён");
 

@@ -16,10 +16,10 @@ namespace DyavolskayaKontora.Controllers
             this.dB = db;
         }
 
-        [HttpPost("НеПригодноДляПыток")]
+        [HttpPost("NePrigodnoDlyaPitok")]
         public async Task<IActionResult> EraseRack(int rackId, string name, int date)
         {
-            var sotrednek = await dB.Sotrudneki.FindAsync(rackId, name, date);
+            var sotrednek = await dB.Devils.FindAsync(rackId, name, date);
             if (sotrednek == null)
             {
                 return NotFound("Орудие пыток не обнаружено");
@@ -31,7 +31,7 @@ namespace DyavolskayaKontora.Controllers
                 Year = date
             };
             dB.Disposals.Add(dispose);
-            dB.Sotrudneki.Remove(sotrednek);
+            dB.Devils.Remove(sotrednek);
 
             await dB.SaveChangesAsync();
 
